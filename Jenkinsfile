@@ -1,39 +1,26 @@
-
 pipeline {
     agent any
 
     stages {
-        stage('Git Checkout') {
+        stage('Build') {
             steps {
-                echo 'Source code checkout stage'
+                sh 'export PATH="/opt/homebrew/bin:$PATH" && mvn clean package'
             }
         }
 
-        stage('Maven Build') {
+        stage('Test Feature Branch') {
             steps {
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t complete-build .'
-            }
-        }
-
-        stage('Run Application') {
-            steps {
-                sh 'docker run --rm complete-build'
+                echo "Building branch: ${env.BRANCH_NAME}"
             }
         }
     }
 
     post {
         success {
-            echo 'Build completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Build failed. Check the console output.'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
